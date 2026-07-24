@@ -1,0 +1,73 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  groupsCreated  Group[]        @relation("GroupCreator")
+  groupMembers   GroupMember[]
+  expensesPaid   Expense[]      @relation("ExpensePayer")
+  expenseShares  ExpenseShare[]
+}
+
+model Group {
+  id        String   @id @default(uuid())
+  name      String
+  createdBy String
+  creator   User     @relation("GroupCreator", fields: [createdBy], references: [id])
+  createdAt DateTime @default(now())
+
+  members  GroupMember[]
+  expenses Expense[]
+}
+
+model GroupMember {
+  id       String   @id @default(uuid())
+  groupId  String
+  userId   String
+  joinedAt DateTime @default(now())
+
+  group Group @relation(fields: [groupId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+}
+
+model Expense {
+  id          String   @id @default(uuid())
+  groupId     String
+  paidBy      String
+  amount      Float
+  description String
+  createdAt   DateTime @default(now())
+
+  group  Group          @relation(fields: [groupId], references: [id])
+  payer  User           @relation("ExpensePayer", fields: [paidBy], references: [id])
+  shares ExpenseShare[]
+}
+
+model ExpenseShare {
+  id          String @id @default(uuid())
+  expenseId   String
+  userId      String
+  shareAmount Float
+
+  expense Expense @relation(fields: [expenseId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+}
