@@ -1,13 +1,14 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
+
+app.use(cors());
 app.use(express.json());
 
-// fake in-memory "database" for now
 let expenses = [];
 
 app.get('/', (req, res) => res.send('Server is alive'));
 
-// Create a new expense
 app.post('/expenses', (req, res) => {
   const { description, amount } = req.body;
   const expense = {
@@ -19,7 +20,6 @@ app.post('/expenses', (req, res) => {
   res.status(201).json(expense);
 });
 
-// Get all expenses
 app.get('/expenses', (req, res) => {
   res.json(expenses);
 });
