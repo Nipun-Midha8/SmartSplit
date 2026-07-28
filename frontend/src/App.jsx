@@ -1,29 +1,39 @@
 import { useState, useEffect } from 'react';
-
-// Temporary hardcoded values until we build login/group selection
-const TEMP_USER_ID = '05dca91d-f7f2-4c3f-9ed9-ac4b28e36f25';
-const TEMP_GROUP_ID = '7a0933bc-497d-4c82-837b-f4d69dfe4eb3';
+import Auth from './Auth';
 
 function App() {
+  const [token, setToken] = useState(null);
+  const [user, setUser] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
 
+  const handleLogin = (newToken, newUser) => {
+    setToken(newToken);
+    setUser(newUser);
+  };
+
   useEffect(() => {
-    fetch('http://localhost:4000/expenses')
+    if (!token) return;
+
+    fetch('http://localhost:4000/expenses', {
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => res.json())
       .then((data) => setExpenses(data));
-  }, []);
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const res = await fetch('http://localhost:4000/expenses', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
-        groupId: TEMP_GROUP_ID,
-        paidBy: TEMP_USER_ID,
+        groupId: '7a0933bc-497d-4c82-837b-f4d69dfe4eb3', // temporary, until groups are built
         description,
         amount: Number(amount),
       }),
@@ -35,9 +45,14 @@ function App() {
     setAmount('');
   };
 
+  if (!token) {
+    return <Auth onLogin={handleLogin} />;
+  }
+
   return (
     <div>
       <h1>SmartSplit</h1>
+      <p>Logged in as {user.name}</p>
 
       <form onSubmit={handleSubmit}>
         <input
