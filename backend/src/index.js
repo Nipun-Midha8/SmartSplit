@@ -1,3 +1,5 @@
+require('dotenv').config();
+const { signup, login } = require('./authController');
 const express = require('express');
 const cors = require('cors');
 const prisma = require('./prismaClient');
@@ -22,3 +24,5 @@ app.get('/expenses', async (req, res) => {
 });
 
 app.listen(4000, () => console.log('Server running on port 4000'));
+app.post('/auth/signup', signup);
+app.post('/auth/login', login);
