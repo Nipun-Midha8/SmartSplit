@@ -4,21 +4,22 @@ const express = require('express');
 const cors = require('cors');
 const prisma = require('./prismaClient');
 const app = express();
+const requireAuth = require('./authMiddleware');
 
 app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => res.send('Server is alive'));
 
-app.post('/expenses', async (req, res) => {
-  const { groupId, paidBy, amount, description } = req.body;
+app.post('/expenses', requireAuth, async (req, res) => {
+  const { groupId, amount, description } = req.body;
   const expense = await prisma.expense.create({
-    data: { groupId, paidBy, amount, description },
+    data: { groupId, paidBy: req.userId, amount, description },
   });
   res.status(201).json(expense);
 });
 
-app.get('/expenses', async (req, res) => {
+app.get('/expenses', requireAuth, async (req, res) => {
   const expenses = await prisma.expense.findMany();
   res.json(expenses);
 });
