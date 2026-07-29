@@ -6,10 +6,13 @@ const prisma = require('./prismaClient');
 const app = express();
 const requireAuth = require('./authMiddleware');
 const { createGroup, getMyGroups, addMember } = require('./groupController');
-const { getGroupBalances } = require('./balanceController');
+
+const { getGroupBalances, getGroupSettlement } = require('./balanceController');
+app.get('/groups/:groupId/settlement', requireAuth, getGroupSettlement);
 app.get('/groups/:groupId/balances', requireAuth, getGroupBalances);
 app.use(cors());
 app.use(express.json());
+
 
 app.get('/', (req, res) => res.send('Server is alive'));
 
