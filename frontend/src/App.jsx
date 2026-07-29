@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import Auth from './Auth';
+import Groups from './Groups';
 
 function App() {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
+  const [activeGroup, setActiveGroup] = useState(null);
   const [expenses, setExpenses] = useState([]);
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
@@ -14,14 +16,14 @@ function App() {
   };
 
   useEffect(() => {
-    if (!token) return;
+    if (!token || !activeGroup) return;
 
-    fetch('http://localhost:4000/expenses', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch(`http://localhost:4000/expenses?groupId=${activeGroup.id}`, {
+  headers: { Authorization: `Bearer ${token}` },
+})
       .then((res) => res.json())
       .then((data) => setExpenses(data));
-  }, [token]);
+  }, [token, activeGroup]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -33,7 +35,7 @@ function App() {
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({
-        groupId: '7a0933bc-497d-4c82-837b-f4d69dfe4eb3', // temporary, until groups are built
+        groupId: activeGroup.id,
         description,
         amount: Number(amount),
       }),
@@ -49,10 +51,17 @@ function App() {
     return <Auth onLogin={handleLogin} />;
   }
 
+  if (!activeGroup) {
+    return <Groups token={token} onSelectGroup={setActiveGroup} />;
+  }
+
   return (
     <div>
       <h1>SmartSplit</h1>
-      <p>Logged in as {user.name}</p>
+      <p>
+        Logged in as {user.name} — Group: {activeGroup.name}
+      </p>
+      <button onClick={() => setActiveGroup(null)}>Back to Groups</button>
 
       <form onSubmit={handleSubmit}>
         <input

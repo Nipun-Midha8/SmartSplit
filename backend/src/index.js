@@ -21,7 +21,10 @@ app.post('/expenses', requireAuth, async (req, res) => {
 });
 
 app.get('/expenses', requireAuth, async (req, res) => {
-  const expenses = await prisma.expense.findMany();
+  const { groupId } = req.query;
+  const expenses = await prisma.expense.findMany({
+    where: { groupId },
+  });
   res.json(expenses);
 });
 
