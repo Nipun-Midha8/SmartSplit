@@ -20,8 +20,8 @@ function App() {
     if (!token || !activeGroup) return;
 
     fetch(`http://localhost:4000/expenses?groupId=${activeGroup.id}`, {
-  headers: { Authorization: `Bearer ${token}` },
-})
+      headers: { Authorization: `Bearer ${token}` },
+    })
       .then((res) => res.json())
       .then((data) => setExpenses(data));
   }, [token, activeGroup]);
@@ -57,37 +57,56 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>SmartSplit</h1>
-      <p>
-        Logged in as {user.name} — Group: {activeGroup.name}
-      </p>
-      <button onClick={() => setActiveGroup(null)}>Back to Groups</button>
+    <div className="min-h-screen flex justify-center p-6">
+      <div className="w-full max-w-md pt-12">
+        <button
+          onClick={() => setActiveGroup(null)}
+          className="text-sm text-ink/50 hover:text-forest mb-6 transition-colors"
+        >
+          ← Groups
+        </button>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Amount"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        <button type="submit">Add Expense</button>
-      </form>
+        <h1 className="font-display text-3xl font-semibold mb-1">{activeGroup.name}</h1>
+        <p className="text-sm text-ink/50 mb-8">{user.name}</p>
 
-      <ul>
-        {expenses.map((expense) => (
-          <li key={expense.id}>
-            {expense.description} — ₹{expense.amount}
-          </li>
-        ))}
-      </ul>
-      <Balances token={token} groupId={activeGroup.id} />
+        <form onSubmit={handleSubmit} className="flex gap-2 mb-8">
+          <input
+            type="text"
+            placeholder="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="flex-1 border-b border-ink/20 bg-transparent px-1 py-2 text-sm focus:outline-none focus:border-forest transition-colors"
+          />
+          <input
+            type="number"
+            placeholder="₹"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            className="w-20 border-b border-ink/20 bg-transparent px-1 py-2 text-sm font-mono focus:outline-none focus:border-forest transition-colors"
+          />
+          <button
+            type="submit"
+            className="bg-forest text-paper rounded-full px-4 py-2 text-sm font-medium hover:bg-forest-dark transition-colors"
+          >
+            Add
+          </button>
+        </form>
+
+        <p className="text-xs uppercase tracking-wide text-ink/40 mb-2">Expenses</p>
+        <ul className="mb-8">
+          {expenses.map((expense) => (
+            <li
+              key={expense.id}
+              className="flex justify-between items-baseline py-2 border-b border-dotted border-ink/20"
+            >
+              <span className="text-sm">{expense.description}</span>
+              <span className="font-mono text-sm tabular-nums">₹{expense.amount}</span>
+            </li>
+          ))}
+        </ul>
+
+        <Balances token={token} groupId={activeGroup.id} />
+      </div>
     </div>
   );
 }

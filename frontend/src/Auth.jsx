@@ -31,37 +31,56 @@ function Auth({ onLogin }) {
   };
 
   return (
-    <div>
-      <h2>{isSignup ? 'Sign Up' : 'Log In'}</h2>
-      <form onSubmit={handleSubmit}>
-        {isSignup && (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="w-full max-w-sm">
+        <h1 className="font-display text-5xl font-semibold text-forest text-center mb-1">
+          SmartSplit
+        </h1>
+        <p className="text-center text-ink/50 text-sm mb-8 tracking-wide uppercase">
+          {isSignup ? 'Create an account' : 'Welcome back'}
+        </p>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          {isSignup && (
+            <input
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="border-b border-ink/20 bg-transparent px-1 py-2 text-sm focus:outline-none focus:border-forest transition-colors"
+            />
+          )}
           <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="border-b border-ink/20 bg-transparent px-1 py-2 text-sm focus:outline-none focus:border-forest transition-colors"
           />
-        )}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <button type="submit">{isSignup ? 'Sign Up' : 'Log In'}</button>
-      </form>
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="border-b border-ink/20 bg-transparent px-1 py-2 text-sm focus:outline-none focus:border-forest transition-colors"
+          />
+          <button
+            type="submit"
+            className="mt-4 bg-forest text-paper rounded-full px-5 py-2.5 text-sm font-medium hover:bg-forest-dark transition-colors"
+          >
+            {isSignup ? 'Sign Up' : 'Log In'}
+          </button>
+        </form>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+        {error && <p className="text-rust text-sm mt-4 text-center">{error}</p>}
 
-      <button onClick={() => setIsSignup(!isSignup)}>
-        {isSignup ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
-      </button>
+        <button
+          onClick={() => setIsSignup(!isSignup)}
+          className="w-full mt-6 text-sm text-ink/50 hover:text-forest transition-colors"
+        >
+          {isSignup ? 'Already have an account? Log in' : "Don't have an account? Sign up"}
+        </button>
+      </div>
     </div>
   );
 }
