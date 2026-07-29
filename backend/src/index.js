@@ -1,20 +1,27 @@
 require('dotenv').config();
-const { signup, login } = require('./authController');
 const express = require('express');
 const cors = require('cors');
 const prisma = require('./prismaClient');
-const app = express();
 const requireAuth = require('./authMiddleware');
+const { signup, login } = require('./authController');
 const { createGroup, getMyGroups, addMember } = require('./groupController');
-
 const { getGroupBalances, getGroupSettlement } = require('./balanceController');
-app.get('/groups/:groupId/settlement', requireAuth, getGroupSettlement);
-app.get('/groups/:groupId/balances', requireAuth, getGroupBalances);
+
+const app = express();
+
 app.use(cors());
 app.use(express.json());
 
-
 app.get('/', (req, res) => res.send('Server is alive'));
+
+app.post('/auth/signup', signup);
+app.post('/auth/login', login);
+
+app.post('/groups', requireAuth, createGroup);
+app.get('/groups', requireAuth, getMyGroups);
+app.post('/groups/:groupId/members', requireAuth, addMember);
+app.get('/groups/:groupId/balances', requireAuth, getGroupBalances);
+app.get('/groups/:groupId/settlement', requireAuth, getGroupSettlement);
 
 app.post('/expenses', requireAuth, async (req, res) => {
   const { groupId, amount, description } = req.body;
@@ -50,8 +57,3 @@ app.get('/expenses', requireAuth, async (req, res) => {
 });
 
 app.listen(4000, () => console.log('Server running on port 4000'));
-app.post('/auth/signup', signup);
-app.post('/auth/login', login);
-app.post('/groups', requireAuth, createGroup);
-app.get('/groups', requireAuth, getMyGroups);
-app.post('/groups/:groupId/members', requireAuth, addMember);

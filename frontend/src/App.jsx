@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import Auth from './Auth';
 import Groups from './Groups';
+import Balances from './Balances';
 
 function App() {
   const [token, setToken] = useState(null);
@@ -86,6 +87,7 @@ function App() {
           </li>
         ))}
       </ul>
+      <Balances token={token} groupId={activeGroup.id} />
     </div>
   );
 }
