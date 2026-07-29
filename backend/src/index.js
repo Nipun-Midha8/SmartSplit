@@ -6,7 +6,8 @@ const prisma = require('./prismaClient');
 const app = express();
 const requireAuth = require('./authMiddleware');
 const { createGroup, getMyGroups, addMember } = require('./groupController');
-
+const { getGroupBalances } = require('./balanceController');
+app.get('/groups/:groupId/balances', requireAuth, getGroupBalances);
 app.use(cors());
 app.use(express.json());
 
@@ -14,9 +15,26 @@ app.get('/', (req, res) => res.send('Server is alive'));
 
 app.post('/expenses', requireAuth, async (req, res) => {
   const { groupId, amount, description } = req.body;
+
+  const members = await prisma.groupMember.findMany({ where: { groupId } });
+  const splitAmount = amount / members.length;
+
   const expense = await prisma.expense.create({
-    data: { groupId, paidBy: req.userId, amount, description },
+    data: {
+      groupId,
+      paidBy: req.userId,
+      amount,
+      description,
+      shares: {
+        create: members.map((member) => ({
+          userId: member.userId,
+          shareAmount: splitAmount,
+        })),
+      },
+    },
+    include: { shares: true },
   });
+
   res.status(201).json(expense);
 });
 
